@@ -1,0 +1,9 @@
+server:
+  port: 6080
+  servlet:
+    context-path: /photobook-demo
+    
+spring:
+  data:
+    mongodb:
+      uri: mongodb://root:example@localhost:27017/test_db
