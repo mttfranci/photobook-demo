@@ -25,28 +25,15 @@ import org.fugerit.java.core.lang.helpers.StringUtils;
     $match: { photobookId: "springio23", },
   },
   {
-    $set:
-      {
-        info: {
-          $ifNull: ["$labels.en", "$labels.def"],
-        },
-      },
+    $set: { info: { $ifNull: ["$labels.en", "$labels.def"], }, },
   },
   {
-    $project: {
-      _id: 0, imageId: 1, author: 1, type: 1, info: 1,
-    },
+    $project: { _id: 0, imageId: 1, author: 1, type: 1, info: 1, },
   },
   {
     $facet: {
-      metadata: [
-        { $count: "total", },
-        { $addFields: { page: NumberInt(1), }, },
-      ],
-      data: [
-        { $skip: 0, },
-        { $limit: 30, },
-      ],
+      metadata: [ { $count: "total", }, { $addFields: { page: NumberInt(1), }, }, ],
+      data: [ { $skip: 0, }, { $limit: 30, }, ],
     },
   },
 ]
@@ -76,22 +63,21 @@ public class PhotobookImagesAggregation {
 		// step 3 - sort
 		agg.add( new Document("$sort", new Document("imageId", 1L) ) );
 		// step 4 - set language info
-		agg.add( new Document("$set", 
-			    new Document("info", 
+		agg.add( new Document("$set",  new Document("info",
 			    new Document("$ifNull", Arrays.asList("$labels."+langCode, "$labels.def")))) );
 		// step 5 - fields projections
-		agg.add( new Document("$project", 
-	    		   new Document("_id", 0L)
-	               .append("imageId", 1L)
-	               .append("author", 1L)
-	               .append("type", 1L)
-	               .append("info", 1L)) );
+		agg.add( new Document("$project",
+				new Document("_id", 0L) .append("imageId", 1L) .
+				append("author", 1L) .append("type", 1L)
+						.append("info", 1L)) );
 		// step 6 - add metadata
 		agg.add( new Document(  new Document("$facet", 
-			    new Document("metadata", Arrays.asList(new Document("$count", "total"), 
+			    new Document("metadata",
+						Arrays.asList(new Document("$count", "total"),
 		                new Document("$addFields", 
 		                new Document("page", currentPage))))
-		            .append("data", Arrays.asList(new Document("$skip", (perPage*(currentPage-1))), 
+		            .append("data",
+							Arrays.asList(new Document("$skip", (perPage*(currentPage-1))),
 		                new Document("$limit", perPage))))) );
 		return agg;
 	}
